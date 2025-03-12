@@ -7,12 +7,31 @@ var app = express();
 // Add static files location
 app.use(express.static("static"));
 
+// Use the pug templating engine
+app.set('view engine', 'pug');
+app.set('views', './app/views');
+
 // Get the functions in the db.js file to use
 const db = require('./services/db');
 
 // Create a route for root - /
 app.get("/", function(req, res) {
-    res.send("Hello world!");
+    res.render("index");
+});
+
+// Create a route for year page 
+app.get("/years", function(req, res) {
+    res.render("years");
+});
+
+// Create a route for specific year page 
+app.get("/2012", function(req, res) {
+    res.render("specific-year");
+});
+
+// Create a route for profile page
+app.get("/profile", function(req, res) {
+    res.render("profile");
 });
 
 // Create a route for testing the db
