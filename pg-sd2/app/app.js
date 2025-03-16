@@ -26,7 +26,17 @@ app.get("/years", function(req, res) {
 
 // Create a route for specific year page 
 app.get("/2012", function(req, res) {
-    res.render("specific-year");
+    var sql = "SELECT posts.*, \
+       DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, \
+       DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, \
+       users.username, \
+       users.display_name \
+       FROM POSTS \
+       JOIN users ON posts.users_id = users.users_id";
+    db.query(sql).then(results => {
+        console.log(results);
+        res.render('specific-year', {data:results});
+    });
 });
 
 // Create a route for profile page

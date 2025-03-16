@@ -1,3 +1,17 @@
 extends layout 
 block content 
     h1 2012
+
+    if data.length
+        each post in data
+            b #{post.display_name} 
+            small #{post.username}
+            h2 #{post.Post_title}
+            p #{post.Full_text.substr(0,150)}... 
+            p Read more...
+            small Date posted: #{post.formatted_posted_date}
+            br
+            small Date of memory: #{post.formatted_memory_date}
+            hr
+    else
+        p No memories found for this year. Be the first to add one!
