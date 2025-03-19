@@ -21,7 +21,11 @@ app.get("/", function(req, res) {
 
 // Create a route for year page 
 app.get("/years", function(req, res) {
-    res.render("years");
+    var allYears = [];
+    for (let year = 2025; year >= 1950; year--) {
+        allYears.push(year);
+    }
+    res.render("years", {allYears});
 });
 
 // Create a route for specific year page 
@@ -37,6 +41,10 @@ app.get("/2012", function(req, res) {
         console.log(results);
         res.render('specific-year', {data:results});
     });
+});
+
+app.get("/post", function(req, res) {
+    res.render("post");
 });
 
 // Create a route for profile page
