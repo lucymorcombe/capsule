@@ -1,16 +1,19 @@
 extends layout 
 block content 
-    h1 2012
+    h1 #{year}
 
     if data.length
         each post in data
             div 
-                a(href='/')
-                    b a(href='/profile/' + post.users_id) #{post.display_name} 
-                    small a(href='/profile/' + post.users_id) #{post.username}
+                a(href=`/post/${post.post_id}`)
+                    b 
+                        a(href=`/profile/${post.users_id}`) #{post.display_name} 
+                    small 
+                        a(href=`/profile/${post.users_id}`) #{post.username}
                     h2 #{post.Post_title}
-                    p #{post.Full_text.substr(0,150)}... 
-                    p Read more...
+                    p #{post.Full_text.substr(0,200)}... 
+                    p 
+                        a(href=`/post/${post.post_id}`) Read more...
                     small Date posted: #{post.formatted_posted_date}
                     br
                     small Date of memory: #{post.formatted_memory_date}

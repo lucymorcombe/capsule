@@ -29,17 +29,29 @@ app.get("/years", function(req, res) {
 });
 
 // Create a route for specific year page 
-app.get("/2012", function(req, res) {
+app.get("/:year", function(req, res) {
+    const year = req.params.year;
     var sql = "SELECT posts.*, \
        DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, \
        DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, \
+       posts.post_id, \
        users.username, \
-       users.display_name \
+       users.display_name, \
+       users.users_id \
        FROM POSTS \
-       JOIN users ON posts.users_id = users.users_id";
-    db.query(sql).then(results => {
-        console.log(results);
-        res.render('specific-year', {data:results});
+       JOIN users ON posts.users_id = users.users_id \
+       WHERE YEAR(posts.DATE_OF_MEMORY) = ?";
+        
+       db.query(sql, [year]).then((results) => {
+        console.log("Raw Query Results:", results);
+
+        if (!Array.isArray(results)) {
+        results = results ? [results] : [];
+        }
+
+        console.log("Final Data Sent to Pug:", results);
+        res.render('specific-year', {data:results, year:year});
+        
     });
 });
 
