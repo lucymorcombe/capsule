@@ -28,6 +28,15 @@ app.get("/years", function(req, res) {
     res.render("years", {allYears});
 });
 
+app.get("/post", function(req, res) {
+    res.render("post");
+});
+
+// Create a route for profile page
+app.get("/profile", function(req, res) {
+    res.render("profile");
+});
+
 // Create a route for specific year page 
 app.get("/:year", function(req, res) {
     const year = req.params.year;
@@ -55,14 +64,8 @@ app.get("/:year", function(req, res) {
     });
 });
 
-app.get("/post", function(req, res) {
-    res.render("post");
-});
 
-// Create a route for profile page
-app.get("/profile", function(req, res) {
-    res.render("profile");
-});
+
 
 // Create a route for testing the db
 app.get("/db_test", function(req, res) {
