@@ -28,8 +28,23 @@ app.get("/years", function(req, res) {
     res.render("years", {allYears});
 });
 
-app.get("/post", function(req, res) {
-    res.render("post");
+app.get("/post/:postid", function(req, res) {
+    const postid = req.params.postid;
+    var sql = "SELECT posts.*, \
+       DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, \
+       DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, \
+       posts.post_id, \
+       posts.users_id, \
+       users.username, \
+       users.display_name, \
+       users.users_id \
+       FROM POSTS \
+       JOIN users ON posts.users_id = users.users_id \
+       WHERE posts.post_id = ?";
+    db.query(sql, [postid]).then(results => {
+        const post = results[0];
+        res.render('post', {post:post});
+    })
 });
 
 // Create a route for profile page

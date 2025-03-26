@@ -5,18 +5,18 @@ block content
     if data.length
         each post in data
             div 
-                a(href=`/post/${post.post_id}`)
-                    b 
-                        a(href=`/profile/${post.users_id}`) #{post.display_name} 
-                    small 
-                        a(href=`/profile/${post.users_id}`) #{post.username}
-                    h2 #{post.Post_title}
-                    p #{post.Full_text.substr(0,200)}... 
-                    p 
-                        a(href=`/post/${post.post_id}`) Read more...
-                    small Date posted: #{post.formatted_posted_date}
-                    br
-                    small Date of memory: #{post.formatted_memory_date}
-                    hr
+               
+                b 
+                    a(href=`/profile/${post.users_id}`) #{post.display_name} 
+                small 
+                    a(href=`/profile/${post.users_id}`) #{post.username}
+                h2 #{post.Post_title}
+                p #{post.Full_text.substr(0,200)}... 
+                p 
+                    a(href=`/post/${post.post_id}`) Read more...
+                small Date posted: #{post.formatted_posted_date}
+                br
+                small Date of memory: #{post.formatted_memory_date}
+                hr
     else
         p No memories found for this year. Be the first to add one!

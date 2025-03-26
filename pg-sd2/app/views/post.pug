@@ -1,11 +1,22 @@
 extends layout 
 block content 
 
-    h1 Hurricane Sandy 
+    b 
+        a(href=`/profile/${post.users_id}`) #{post.display_name} 
+    small 
+        a(href=`/profile/${post.users_id}`) #{post.username}
+    h2 #{post.Post_title}
+    p #{post.Full_text}
+    small Date posted: #{post.formatted_posted_date}
+    br
+    small Date of memory: #{post.formatted_memory_date}    
+    
 
-    p A devastating storm that hit the U.S. East coast in october 2012, This affected 
-    parts of canada and several carribean nations.Creating hybrid storm.
+    //- h1 Hurricane Sandy 
+
+    //- p A devastating storm that hit the U.S. East coast in october 2012, This affected 
+    //- parts of canada and several carribean nations.Creating hybrid storm.
 
 
-    p Avy Ruslip
-    p @Avylip
+    //- p Avy Ruslip
+    //- p @Avylip
