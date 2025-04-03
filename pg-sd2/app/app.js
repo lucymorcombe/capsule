@@ -48,9 +48,38 @@ app.get("/post/:postid", function(req, res) {
 });
 
 // Create a route for profile page
-app.get("/profile", function(req, res) {
-    res.render("profile");
+app.get("/profile/:usersid", function(req, res) {
+    const usersid = req.params.usersid;
+console.log(usersid)
+    const sql = `
+        SELECT users.Username, users.Display_name, users.Email, users.bio, users.Users_id 
+        FROM USERS AS users
+        WHERE users.Users_id = ${usersid}`;
+
+    db.query(sql).then( ( results) => {
+        console.log('reslts', results)
+        // if (err) {
+        //     return res.status(500).send("Database error");
+        // }
+
+        if (results.length === 0) {
+            return res.render("profile", { profile: null, message: "User not found." });
+        }
+
+        const profile = {
+            Display_name: 'Username',
+            Username: results[0].Username,
+            Email: results[0].Email,
+            bio: results[0].bio,
+            Users_id: results[0].Users_id
+        };
+
+        res.render("profile",  {profile:profile} );
+    })
 });
+
+
+
 
 // Create a route for specific year page 
 app.get("/:year", function(req, res) {

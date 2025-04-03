@@ -1,9 +1,13 @@
-extends layout 
-block content 
+extends layout
+
+block content
     h1 Profile
-    h Display name 
-    p Username
-    h2 Bio 
-    h3 Posts 
-    p Post title 
-    p Likes 
+
+    if profile
+        h2= profile.Display_name
+        p Username: #{profile.Username}
+        p Email: #{profile.Email}
+        h3 Bio
+        p #{profile.bio}
+    else
+        p #{message}
