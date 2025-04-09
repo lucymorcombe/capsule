@@ -62,7 +62,7 @@ console.log(usersid)
         //     return res.status(500).send("Database error");
         // }
 
-        if (results.length === 0) {
+        if (results.length == 0) {
             return res.render("profile", { profile: null, message: "User not found." });
         }
 
