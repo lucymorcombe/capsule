@@ -7,6 +7,9 @@ var app = express();
 // Add static files location
 app.use(express.static("static"));
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 // Use the pug templating engine
 app.set('view engine', 'pug');
 app.set('views', './app/views');
@@ -135,20 +138,22 @@ app.get("/:year", function(req, res) {
 
 
 app.post('/set-password', async function (req, res) {
-    params = req.body;
+    var params = req.body;
     var user = new User(params.email);
     try {
-        uId = await user.getIdFromEmail();
+        let uId = await user.getIdFromEmail(params.password);
+        console.log(uId);
         if (uId) {
-            // If a valid, existing user is found, set the password and redirect to the users single-student page
+            // If user already exists, redirect to their profile page
             await user.setUserPassword(params.password);
             console.log(req.session.id);
-            res.send('Password set successfully');
+            res.redirect('/profile/' + uId);
         }
         else {
             // If no existing user is found, add a new one
-            newId = await user.addUser(params.email);
-            res.send('Perhaps a page where a new user sets a programme would be good here');
+            console.log("Trying to add user with:", params);
+            let newId = await user.addUser(params.username, params.display_name, params.password);
+            res.redirect('/profile/' + newId);
         }
     } catch (err) {
         console.error(`Error while adding password `, err.message);

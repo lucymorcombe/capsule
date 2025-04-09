@@ -2,6 +2,10 @@ extends layout
 block content
     h1 Register here
     form(action='/set-password' method='POST')
+        label(for='username') Enter your username: 
+        input(name='username') 
+        label(for='display_name') Enter your display name: 
+        input(name='display_name') 
         label(for='email') Enter your email: 
         input(name='email') 
         label(for='email') Enter your password: 

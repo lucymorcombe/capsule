@@ -18,12 +18,15 @@ class User {
     }
     
     // Get an existing user id from an email address, or return false if not found
-    async getIdFromEmail()  {
-        var sql = "SELECT id FROM Users WHERE Users.email = ?";
+    async getIdFromEmail(password)  {
+        console.log("Running getIdFromEmail for:", this.email);
+        var sql = "SELECT users_id FROM Users WHERE Users.email = ?";
         const result = await db.query(sql, [this.email]);
+        console.log("DB result:", result);
+
         // TODO LOTS OF ERROR CHECKS HERE..
         if (JSON.stringify(result) != '[]') {
-            this.id = result[0].id;
+            this.id = result[0].users_id;
             return this.id;
         }
         else {
@@ -34,19 +37,19 @@ class User {
     // Add a password to an existing user
     async setUserPassword(password) {
         const pw = await bcrypt.hash(password, 10);
-        var sql = "UPDATE Users SET password = ? WHERE Users.id = ?"
+        var sql = "UPDATE Users SET password = ? WHERE Users_id = ?"
         const result = await db.query(sql, [pw, this.id]);
         return true;
     }
     
     // Add a new record to the users table    
-    async addUser(password) {
-        const pw = await bcrypt.hash(password, 10);
-        var sql = "INSERT INTO Users (email, password) VALUES (? , ?)";
-        const result = await db.query(sql, [this.email, pw]);
+    async addUser(username, display_name, password) {
+        const pw = await bcrypt.hash(password, 10); 
+        var sql = "INSERT INTO Users (username, Display_name, email, password) VALUES (?, ?, ?, ?)";
+        const result = await db.query(sql, [username, display_name, this.email, pw]);
         console.log(result.insertId);
         this.id = result.insertId;
-        return true;
+        return this.id;
     }
 
     // Test a submitted password against a stored password
