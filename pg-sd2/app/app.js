@@ -28,6 +28,15 @@ app.use(session({
   cookie: { secure: false }
 }));
 
+//Make sessions available inside pugs
+app.use(function(req, res, next){
+    res.locals.loggedIn = req.session.loggedIn || false;
+    res.locals.uid = req.session.uid;
+    res.locals.username = req.session.username;
+    res.locals.display_name = req.session.display_name;
+    next();
+});
+
 // Create a route for root - /
 app.get("/", function(req, res) {
     res.render("index");
@@ -163,27 +172,46 @@ app.post('/set-password', async function (req, res) {
 // Check submitted email and password pair
 app.post('/authenticate', async function (req, res) {
     params = req.body;
+    console.log("Attempting login with:", params);
+
     var user = new User(params.email);
     try {
-        uId = await user.getIdFromEmail();
+        let uId = await user.getIdFromEmail(params.password);
+        console.log("User ID found:", uId);
+
         if (uId) {
             match = await user.authenticate(params.password);
+            console.log("Password match result:", match); 
+
             if (match) {
                 req.session.uid = uId;
                 req.session.loggedIn = true;
-                console.log(req.session.id);
-                res.redirect('/student-single/' + uId);
+                console.log("Session created for:", req.session.uid);
+
+                //next 5 lines are for storing username and display name in the session
+                const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
+                const userInfo = await db.query(sql, [uId]);
+
+                if (userInfo.length > 0) {
+                    req.session.display_name = userInfo[0].display_name;
+                    req.session.username = userInfo[0].username;
+                }
+
+                res.redirect('/profile/' + uId);
             }
             else {
                 // TODO improve the user journey here
+                console.log("Invalid password entered.");
                 res.send('invalid password');
             }
         }
         else {
+            console.log("No user found for email:", params.email);
             res.send('invalid email');
         }
     } catch (err) {
         console.error(`Error while comparing `, err.message);
+        res.send("Server error during login.");
     }
 });
 

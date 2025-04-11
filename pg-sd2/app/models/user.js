@@ -66,7 +66,7 @@ class User {
 
 
         // Get the stored, hashed password for the user
-        var sql = "SELECT password FROM Users WHERE id = ?";
+        var sql = "SELECT password FROM Users WHERE users_id = ?";
         const result = await db.query(sql, [this.id]);
 
         if (result.length === 0) {

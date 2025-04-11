@@ -4,9 +4,18 @@ html
     body 
         div 
             h1 Capsule 
-            ul 
-                li Trending 
+            ul     
                 li 
                     a(href='/years') Years 
-                li My Account 
+                if loggedIn
+                    li 
+                        a(href=`/profile/${uid}`) My Account 
+                    li 
+                        a(href='/logout') Logout
+                else 
+                    li 
+                        a(href='/login') Login
+                    li 
+                        a(href='/register') Register
+                
         block content
