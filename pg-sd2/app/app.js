@@ -56,19 +56,68 @@ app.get("/post/:postid", function(req, res) {
     var sql = "SELECT posts.*, \
        DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, \
        DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, \
-       posts.post_id, \
-       posts.users_id, \
-       users.username, \
-       users.display_name, \
-       users.users_id \
+       posts.Post_id, \
+       posts.Users_id, \
+       users.Username, \
+       users.Display_name, \
+       users.Users_id \
        FROM POSTS \
-       JOIN users ON posts.users_id = users.users_id \
-       WHERE posts.post_id = ?";
+       JOIN users ON posts.Users_id = users.Users_id \
+       WHERE posts.Post_id = ?";
     db.query(sql, [postid]).then(results => {
         const post = results[0];
-        res.render('post', {post:post});
+        const user = req.session.user;
+        res.render('post', {post:post, user: user});
     })
 });
+
+// Viewing a single post by id
+app.get("/post/:postid", function(req, res) {
+    const postid = req.params.postid;
+    var sql = "SELECT posts.*, DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, users.Username, users.Display_name FROM POSTS JOIN users ON posts.Users_id = users.Users_id WHERE posts.Post_id = ?";
+    db.query(sql, [postid]).then(results => {
+        const post = results[0];
+        res.render('post', { post: post, user: req.session.user });
+    });
+});
+
+// Showing the new post form
+app.get("/post", (req, res) => {
+    res.render('post', { post: null, user: req.session.user });
+});
+
+
+
+//single post page
+app.get("/single-post/:id", async function (req, res) {
+    var postid = req.params.id;
+    var myPost = new Post(postid);
+    await myPost.getPostName();
+    await myPost.getPostContent();
+    await myPost.getPostDate();
+    console.log(myPost);
+    res.send(myPost)
+})
+
+app.post("/post", (req, res) => {
+    const { Users_id, Post_title, Full_text } = req.body;
+
+    const sql = `
+        INSERT INTO posts (Users_id, Post_title, Full_text, DATE_posted)
+        VALUES (?, ?, ?, NOW())
+    `;
+
+    db.query(sql, [Users_id, Post_title, Full_text])
+        .then(result => {
+            const newPostId = result.insertId;
+            res.redirect(`/single-post/${newPostId}`); 
+        })
+        //.catch(err => {
+          //  console.error(err);
+           // res.status(500).send("Could not save post.");
+        //});
+});
+
 
 // Create a route for profile page
 app.get("/profile/:usersid", function(req, res) {
@@ -107,15 +156,42 @@ app.get('/register', function (req, res) {
 });
 
 // Login
-app.get('/login', function (req, res) {
+app.get('/login', (req, res) => {
     res.render('login');
 });
+
+app.post('/authenticate', (req, res) => {
+    const { email, password } = req.body;
+
+    const sql = "SELECT * FROM users WHERE Email = ? AND Password = ?";
+    db.query(sql, [email, password])
+        .then(results => {
+            if (results.length > 0) {
+                // User found, set session data
+                req.session.user = {
+                    Users_id: results[0].Users_id,
+                    Username: results[0].Username,
+                    Display_name: results[0].Display_name
+                };
+                res.redirect('/');  // Redirect to homepage or any other page
+            } else {
+                res.send("Invalid email or password.");
+            }
+        })
+       // .catch(err => {
+            //console.error(err);
+            //res.status(500).send("Server error during login.");
+        //});
+});
+
+
 
 // Logout
 app.get('/logout', function (req, res) {
     req.session.destroy();
     res.redirect('/login');
   });
+  
 
 
 // Create a route for specific year page 
