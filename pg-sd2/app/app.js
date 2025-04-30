@@ -160,6 +160,30 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
+app.post('/authenticate', (req, res) => {
+    const { email, password } = req.body;
+
+    const sql = "SELECT * FROM users WHERE Email = ? AND Password = ?";
+    db.query(sql, [email, password])
+        .then(results => {
+            if (results.length > 0) {
+                // User found, set session data
+                req.session.user = {
+                    Users_id: results[0].Users_id,
+                    Username: results[0].Username,
+                    Display_name: results[0].Display_name
+                };
+                res.redirect('/');  // Redirect to homepage or any other page
+            } else {
+                res.send("Invalid email or password.");
+            }
+        })
+       // .catch(err => {
+            //console.error(err);
+            //res.status(500).send("Server error during login.");
+        //});
+});
+
 
 
 // Logout
@@ -221,51 +245,7 @@ app.post('/set-password', async function (req, res) {
     }
 });
 
-// Check submitted email and password pair
-app.post('/authenticate', async function (req, res) {
-    params = req.body;
-    console.log("Attempting login with:", params);
-
-    var user = new User(params.email);
-    try {
-        let uId = await user.getIdFromEmail(params.password);
-        console.log("User ID found:", uId);
-
-        if (uId) {
-            match = await user.authenticate(params.password);
-            console.log("Password match result:", match); 
-
-            if (match) {
-                req.session.uid = uId;
-                req.session.loggedIn = true;
-                console.log("Session created for:", req.session.uid);
-
-                //next 5 lines are for storing username and display name in the session
-                const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
-                const userInfo = await db.query(sql, [uId]);
-
-                if (userInfo.length > 0) {
-                    req.session.display_name = userInfo[0].display_name;
-                    req.session.username = userInfo[0].username;
-                }
-
-                res.redirect('/profile/' + uId);
-            }
-            else {
-                // TODO improve the user journey here
-                console.log("Invalid password entered.");
-                res.send('invalid password');
-            }
-        }
-        else {
-            console.log("No user found for email:", params.email);
-            res.send('invalid email');
-        }
-    } catch (err) {
-        console.error(`Error while comparing `, err.message);
-        res.send("Server error during login.");
-    }
-});
+// Che
 
 
 // Create a route for testing the db
