@@ -160,30 +160,6 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
-app.post('/authenticate', (req, res) => {
-    const { email, password } = req.body;
-
-    const sql = "SELECT * FROM users WHERE Email = ? AND Password = ?";
-    db.query(sql, [email, password])
-        .then(results => {
-            if (results.length > 0) {
-                // User found, set session data
-                req.session.user = {
-                    Users_id: results[0].Users_id,
-                    Username: results[0].Username,
-                    Display_name: results[0].Display_name
-                };
-                res.redirect('/');  // Redirect to homepage or any other page
-            } else {
-                res.send("Invalid email or password.");
-            }
-        })
-       // .catch(err => {
-            //console.error(err);
-            //res.status(500).send("Server error during login.");
-        //});
-});
-
 
 
 // Logout
