@@ -322,4 +322,7 @@ app.get("/hello/:name", function(req, res) {
 // Start server on port 3000
 app.listen(3000,function(){
     console.log(`Server running at http://127.0.0.1:3000/`);
-});
+});app.get('/post', function(req, res) {
+    res.render('post'); // Make sure post.pug exists in the 'views' folder
+    });
+    
