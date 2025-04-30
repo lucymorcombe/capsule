@@ -56,7 +56,7 @@ app.get("/years", function(req, res) {
 
 // Show the new post form
 app.get("/post", (req, res) => {
-    console.log("❗❗❗session data at /post:", req.session);
+    console.log("â—â—â—session data at /post:", req.session);
     // check if user is logged in
     if (!req.session.loggedIn) {
         // if not logged in, send to login page
@@ -181,30 +181,6 @@ app.get('/login', (req, res) => {
     res.render('login');
 });
 
-app.post('/authenticate', (req, res) => {
-    const { email, password } = req.body;
-
-    const sql = "SELECT * FROM users WHERE Email = ? AND Password = ?";
-    db.query(sql, [email, password])
-        .then(results => {
-            if (results.length > 0) {
-                // User found, set session data
-                req.session.user = {
-                    Users_id: results[0].Users_id,
-                    Username: results[0].Username,
-                    Display_name: results[0].Display_name
-                };
-                res.redirect('/');  // Redirect to homepage or any other page
-            } else {
-                res.send("Invalid email or password.");
-            }
-        })
-       // .catch(err => {
-            //console.error(err);
-            //res.status(500).send("Server error during login.");
-        //});
-});
-
 
 
 // Logout
@@ -266,9 +242,6 @@ app.post('/set-password', async function (req, res) {
     }
 });
 
-<<<<<<< HEAD
-// Che
-=======
 // Check submitted email and password pair
 app.post('/authenticate', async function (req, res) {
     params = req.body;
@@ -318,7 +291,6 @@ app.post('/authenticate', async function (req, res) {
         res.send("Server error during login.");
     }
 });
->>>>>>> 1a4bd682369daafb60dcfcf6c34823bf57c41ba7
 
 
 // Create a route for testing the db
