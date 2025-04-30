@@ -25,7 +25,10 @@ app.use(session({
   secret: 'secretkeysdfjsflyoifasd',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { 
+    secure: false,
+    maxAge: 10 * 60 * 1000 
+}
 }));
 
 //Make sessions available inside pugs
@@ -51,73 +54,91 @@ app.get("/years", function(req, res) {
     res.render("years", {allYears});
 });
 
-app.get("/post/:postid", function(req, res) {
-    const postid = req.params.postid;
-    var sql = "SELECT posts.*, \
-       DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, \
-       DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, \
-       posts.Post_id, \
-       posts.Users_id, \
-       users.Username, \
-       users.Display_name, \
-       users.Users_id \
-       FROM POSTS \
-       JOIN users ON posts.Users_id = users.Users_id \
-       WHERE posts.Post_id = ?";
-    db.query(sql, [postid]).then(results => {
-        const post = results[0];
-        const user = req.session.user;
-        res.render('post', {post:post, user: user});
-    })
+// Show the new post form
+app.get("/post", (req, res) => {
+    console.log("❗❗❗session data at /post:", req.session);
+    // check if user is logged in
+    if (!req.session.loggedIn) {
+        // if not logged in, send to login page
+        return res.redirect('/login');
+    }
+
+    const user = {
+        Users_id: req.session.uid,
+        Username: req.session.username,
+        Display_name: req.session.display_name
+    };
+
+    //if logged in show post form
+    res.render('post', { post: null, user });
 });
 
-// Viewing a single post by id
-app.get("/post/:postid", function(req, res) {
-    const postid = req.params.postid;
-    var sql = "SELECT posts.*, DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date, DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date, users.Username, users.Display_name FROM POSTS JOIN users ON posts.Users_id = users.Users_id WHERE posts.Post_id = ?";
-    db.query(sql, [postid]).then(results => {
-        const post = results[0];
-        res.render('post', { post: post, user: req.session.user });
+// Handle post creation (form submission)
+app.post("/post", (req, res) => {
+    if (!req.session.loggedIn) {
+        return res.redirect('/login');
+    }
+    
+    const { Post_title, Full_text } = req.body;
+    const Users_id = req.session.uid;
+
+    if (!Users_id || !Post_title || !Full_text) {
+        return res.status(400).send("All fields are required.");
+    }
+
+    //check if user exists
+    const userCheckSql = `SELECT * FROM users WHERE Users_id = ?`;
+    db.query(userCheckSql, [Users_id], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).send("Could not check user.");
+        }
+
+        if (results.length === 0) {
+            return res.status(400).send("User not found.");
+        }
+
+        // add new post to database
+        const insertSql = `
+            INSERT INTO posts (Users_id, Post_title, Full_text, DATE_posted)
+            VALUES (?, ?, ?, NOW())
+        `;
+
+        db.query(insertSql, [Users_id, Post_title, Full_text], (err, result) => {
+            if (err) {
+                console.error("Error inserting post:", err);
+                return res.status(500).send("Could not save post.");
+            }
+
+            //go to new post
+            const newPostId = result.insertId;
+            res.redirect(`/single-post/${newPostId}`);
+        });
     });
 });
 
-// Showing the new post form
-app.get("/post", (req, res) => {
-    res.render('post', { post: null, user: req.session.user });
-});
-
-
-
-//single post page
+// View a single post by ID
 app.get("/single-post/:id", async function (req, res) {
-    var postid = req.params.id;
-    var myPost = new Post(postid);
-    await myPost.getPostName();
-    await myPost.getPostContent();
-    await myPost.getPostDate();
-    console.log(myPost);
-    res.send(myPost)
-})
-
-app.post("/post", (req, res) => {
-    const { Users_id, Post_title, Full_text } = req.body;
-
+    const postid = req.params.id;
     const sql = `
-        INSERT INTO posts (Users_id, Post_title, Full_text, DATE_posted)
-        VALUES (?, ?, ?, NOW())
+        SELECT posts.*, 
+        DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date,
+        DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date,
+        users.Username, users.Display_name
+        FROM POSTS
+        JOIN users ON posts.Users_id = users.Users_id
+        WHERE posts.Post_id = ?
     `;
 
-    db.query(sql, [Users_id, Post_title, Full_text])
-        .then(result => {
-            const newPostId = result.insertId;
-            res.redirect(`/single-post/${newPostId}`); 
-        })
-        //.catch(err => {
-          //  console.error(err);
-           // res.status(500).send("Could not save post.");
-        //});
+    try {
+        const results = await db.query(sql, [postid]);
+        const post = results[0];
+        res.render("post", { post: post, user: req.session.user });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Could not fetch post.");
+    }
 });
-
 
 // Create a route for profile page
 app.get("/profile/:usersid", function(req, res) {
@@ -126,10 +147,10 @@ console.log(usersid)
     const sql = `
         SELECT users.Username, users.Display_name, users.Email, users.bio, users.Users_id 
         FROM USERS AS users
-        WHERE users.Users_id = ${usersid}`;
+        WHERE users.Users_id = ?`;
 
-    db.query(sql).then( ( results) => {
-        console.log('reslts', results)
+    db.query(sql, [usersid]).then( ( results) => {
+        console.log('results', results)
         // if (err) {
         //     return res.status(500).send("Database error");
         // }
@@ -245,7 +266,59 @@ app.post('/set-password', async function (req, res) {
     }
 });
 
+<<<<<<< HEAD
 // Che
+=======
+// Check submitted email and password pair
+app.post('/authenticate', async function (req, res) {
+    params = req.body;
+    console.log("Attempting login with:", params);
+
+    var user = new User(params.email);
+    try {
+        let uId = await user.getIdFromEmail(params.password);
+        console.log("User ID found:", uId);
+
+        if (uId) {
+            match = await user.authenticate(params.password);
+            console.log("Password match result:", match); 
+
+            if (match) {
+                req.session.uid = uId;
+                req.session.loggedIn = true;
+                console.log("Session created for:", req.session.uid);
+
+                //next 5 lines are for storing username and display name in the session
+                const sql = "SELECT display_name, username FROM Users WHERE users_id = ?";
+                const userInfo = await db.query(sql, [uId]);
+
+                if (userInfo.length > 0) {
+                    console.log("User Info:", userInfo);  // Add this line to debug the query results
+
+                    req.session.display_name = userInfo[0].display_name;
+                    req.session.username = userInfo[0].username;
+                    console.log("Session display_name and username:", req.session.display_name, req.session.username);
+
+                }
+
+                res.redirect('/profile/' + uId);
+            }
+            else {
+                // TODO improve the user journey here
+                console.log("Invalid password entered.");
+                res.send('invalid password');
+            }
+        }
+        else {
+            console.log("No user found for email:", params.email);
+            res.send('invalid email');
+        }
+    } catch (err) {
+        console.error(`Error while comparing `, err.message);
+        res.send("Server error during login.");
+    }
+});
+>>>>>>> 1a4bd682369daafb60dcfcf6c34823bf57c41ba7
 
 
 // Create a route for testing the db
