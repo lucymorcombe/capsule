@@ -1,11 +1,72 @@
 extends layout
 block content
-    h1 Login here
-    form(action='/authenticate' method='POST')
-        label(for='email') Enter your email: 
-        input(name='email') 
-        br
-        label(for='email') Enter your password: 
-        input(name='password' type = 'password')
-        br
-        input(type='submit' value='Submit')
+    div.loginForm
+        form(action='/authenticate' method='POST')
+            label(for='email') Enter your email: 
+            br
+            input(name='email' type = 'email') 
+            br
+            br
+            label(for='password') Enter your password: 
+            br
+            input(name='password' type = 'password')
+            br
+            br
+            input(type='submit' value='Login')
+        p Don't have an account? 
+            a(href='/register') Register now.
+
+    style. 
+        .loginForm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 26vw;
+            //- height: 30vw;
+            //- margin-left: 37vw;
+            box-shadow: 1px 1px 5px #495ad1;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .loginForm label {
+            font-family: "SUSE", sans-serif;
+            font-size: 16px;
+            color: #495ad1;
+        }
+
+        .loginForm input[type="email"],
+        .loginForm input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #495ad1;
+            border-radius: 5px;
+            font-size: 14px;
+            font-family: "SUSE", sans-serif;
+        }
+
+        .loginForm input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #495ad1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .loginForm p {
+            padding-top: 10px;
+            color: #808080;
+            text-align: center;
+        }
+
+        .loginForm a {
+            text-decoration: none;
+            color: #495ad1;
+        }
