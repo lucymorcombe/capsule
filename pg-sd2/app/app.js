@@ -47,11 +47,18 @@ app.get("/", function(req, res) {
 
 // Create a route for year page 
 app.get("/years", function(req, res) {
-    var allYears = [];
+    const decade = parseInt(req.query.decade);
+
+    let allYears = [];
     for (let year = 2025; year >= 1950; year--) {
         allYears.push(year);
     }
-    res.render("years", {allYears});
+
+if (decade && !isNaN(decade)) {
+    allYears = allYears.filter(year => year >= decade && year < decade + 10);
+}
+
+    res.render("years", {allYears, selectedDecade : decade});
 });
 
 // Show the new post form
