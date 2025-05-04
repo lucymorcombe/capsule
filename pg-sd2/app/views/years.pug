@@ -1,10 +1,162 @@
 extends layout 
 block content 
-    h1 Years 
-    ul 
+    h1.yearsPage Years 
+    p.yearsIntro Explore memories from every year between 1950 and 2025. Whether you're looking to relive a major world event, rediscover an old trend, or simply see what people were experiencing at the time, each year is filled with personal stories and moments shared by our users. Click on any year to start your journey through time.
+    div.filters
+    ul.decadeList
+        li: a(href='/years') All
+        li: a(href='/years?decade=1950') 50s
+        li: a(href='/years?decade=1960') 60s
+        li: a(href='/years?decade=1970') 70s
+        li: a(href='/years?decade=1980') 80s
+        li: a(href='/years?decade=1990') 90s
+        li: a(href='/years?decade=2000') 00s
+        li: a(href='/years?decade=2010') 10s
+        li: a(href='/years?decade=2020') 20s
+    ul.yearList
         each year in allYears
             li 
-                //- a(href='/2012') 2012
+                a(href=`/${year}`)
+                    div.leftDot
+                    div.rightDot
+                    div.topColour 
+                    div.leftRing 
+                    div.rightRing
+                    div.yearText #{year}
 
-                a(href=`/${year}`) #{year} 
+    style. 
+
+        h1.yearsPage {
+            color: #495ad1;
+            text-align: center;
+            font-size: 56px;
+            text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        p.yearsIntro {
+            margin-left: 20vw;
+            margin-right: 20vw;
+            text-align: center;
+            color: #495ad1;
+            padding-bottom: 20px;
+        }
+
+        .decadeList {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 70vw;
+            justify-content: space-between;
+            margin-left: 15vw;
+            gap: 10px;
+            padding: 0;
+            list-style: none;
+            margin-top: 0.5rem;
+            margin-bottom: 50px;
+        }
+
+        .decadeList li a {
+            display: inline-block;
+            padding: 2px 20px;
+            background-color: #495ad1;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .yearList {
+            max-width: 80vw;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-left: 10vw;
+            padding-left: 0px;
+            row-gap: 50px;
+        }
+
+        .yearList li {
+            width: 15vw;
+            height: 15vw;
+            border-radius: 20px;
+            background-color: #f5f5f5;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            padding: 0;
+            margin-left: 2vw;
+            margin-right: 2vw;
+            //- overflow: hidden;
+        }
+
+        .yearList a {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .yearText {
+            position: absolute;
+            font-size: 44px;
+            padding-top: 2vw;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            
+        }
+
+        .topColour {
+            position: absolute;
+            width: 15vw;
+            height: 4vw;
+            background-color: #495ad1;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .leftDot {
+            position: absolute;
+            width: 2.5vw;
+            height: 2.5vw;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            z-index: 10;
+            top: 0.75vw;
+            left: 2vw;
+        }
+
+        .rightDot {
+            position: absolute;
+            width: 2.5vw;
+            height: 2.5vw;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            z-index: 10;
+            top: 0.75vw;
+            right: 2vw;
+        }
+
+        .leftRing {
+            position: absolute;
+            width: 0.75vw;
+            height: 3vw;
+            background-color: black;
+            border-radius: 10px;
+            z-index: 11;
+            top: -0.75vw;
+            left: 2.85vw;
+        }
+
+        .rightRing {
+            position: absolute;
+            width: 0.75vw;
+            height: 3vw;
+            background-color: black;
+            border-radius: 10px;
+            z-index: 11;
+            top: -0.75vw;
+            right: 2.85vw;
+        }
 

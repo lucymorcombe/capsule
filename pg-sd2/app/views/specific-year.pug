@@ -1,22 +1,98 @@
-extends layout 
-block content 
+extends layout
+
+block content
     h1 #{year}
 
+    - const hasDefaultHistory = year != 2012;
+
+    if hasDefaultHistory
+        // History 1
+        div.history-snippet
+            h3 The #{year} Global Climate Unity Pact
+            p
+                | In #{year}, world leaders signed the landmark Global Climate Unity Pact (GCUP), aiming to drastically reduce emissions and shift to clean energy. This pivotal agreement marked the first time all major economies committed to net-zero targets.
+                span(id="more-text-1", style="display:none;")
+                    | After years of negotiations, leaders from 190+ countries agreed on binding commitments to cap warming at 1.5°C, with strict reporting and penalties. The pact also unlocked $500 billion in funding for developing nations, sparked major corporate pledges for sustainability, and reshaped international trade policies around green energy.
+            p
+                a(href="#", class="read-more", data-target="more-text-1") Read more...
+
+            div 
+                b 
+                    a(href="/profile/betty") Betty 
+                small 
+                    a(href="mailto:betty@trueet.yahoo") betty@trueet.yahoo
+                h2 Climate Action: A New Era
+                p The Global Climate Unity Pact has inspired new hope worldwide. As a witness, I feel motivated to push for local climate solutions and awareness...
+                p 
+                    a(href="/post/betty-#{year}") Read more...
+                small Date posted: 3/04/#{year}
+                br
+                small Date of memory: 3/01/#{year}
+                hr
+
+        // History 2
+        div.history-snippet
+            h3 Major Breakthrough in AI (#{year})
+            p
+                | In #{year}, artificial intelligence made a groundbreaking leap with the debut of the first truly general-purpose AI assistant. This system integrated real-time reasoning, creativity, and emotional intelligence, redefining personal and professional workflows.
+                span(id="more-text-2", style="display:none;")
+                    | Its rollout revolutionized sectors from healthcare to engineering, enabling machines to collaborate meaningfully with humans. A robust ethics framework was built in, emphasizing transparency and safety, and its launch spurred global debates about AI rights and governance.
+            p
+                a(href="#", class="read-more", data-target="more-text-2") Read more...
+
+            div 
+                b 
+                    a(href="/profile/alex") Alex 
+                small 
+                    a(href="mailto:alex@innovationhub.com") alex@innovationhub.com
+                h2 AI: Humanity’s Bold New Frontier
+                p Witnessing AI’s incredible evolution this year has been both thrilling and a bit daunting. I’m hopeful for a future where humans and AI collaborate for good.
+                p 
+                    a(href="/post/alex-#{year}") Read more...
+                small Date posted: 5/15/#{year}
+                br
+                small Date of memory: 5/10/#{year}
+                hr
+
+        // History 3
+        div.history-snippet
+            h3 Space Exploration: The #{year} Mars Habitat Mission
+            p
+                | In #{year}, humanity celebrated the successful landing and activation of the first fully self-sustaining habitat on Mars. This monumental feat was seen as a giant leap toward a permanent human presence beyond Earth.
+                span(id="more-text-3", style="display:none;")
+                    | The habitat featured advanced life-support systems, solar energy farms, and 3D-printed structures from Martian soil. It hosted 12 astronauts for over a year, providing vital data on long-term survival and paving the way for larger settlements.
+            p
+                a(href="#", class="read-more", data-target="more-text-3") Read more...
+
+            div 
+                b 
+                    a(href="/profile/luna") Luna 
+                small 
+                    a(href="mailto:luna@spacefrontiers.org") luna@spacefrontiers.org
+                h2 Life on Mars: A Dream Realized
+                p As someone passionate about space, the Mars habitat success fills me with awe. Humanity is truly becoming an interplanetary species!
+                p 
+                    a(href="/post/luna-#{year}") Read more...
+                small Date posted: 7/20/#{year}
+                br
+                small Date of memory: 7/18/#{year}
+                hr
+
+    // User Posts
     if data.length
         each post in data
             div 
-               
                 b 
                     a(href=`/profile/${post.users_id}`) #{post.display_name} 
                 small 
-                    a(href=`/profile/${post.users_id}`) #{post.username}
+                    a(href=`mailto:${post.username}`) #{post.username}
                 h2 #{post.Post_title}
-                p #{post.Full_text.substr(0,200)}... 
+                p #{post.Full_text.substr(0,200)}...
                 p 
                     a(href=`/post/${post.post_id}`) Read more...
                 small Date posted: #{post.formatted_posted_date}
                 br
                 small Date of memory: #{post.formatted_memory_date}
                 hr
-    else
-        p No memories found for this year. Be the first to add one!
+    else if !hasDefaultHistory
+        p Add a New memory for year 
