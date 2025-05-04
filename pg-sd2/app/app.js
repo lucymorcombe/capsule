@@ -119,13 +119,13 @@ app.post("/post", (req, res) => {
 
             //go to new post
             const newPostId = result.insertId;
-            res.redirect(`/single-post/${newPostId}`);
+            res.redirect(`/post/${newPostId}`);
         });
     });
 });
 
 // View a single post by ID
-app.get("/single-post/:id", async function (req, res) {
+app.get("/post/:id", async function (req, res) {
     const postid = req.params.id;
     const sql = `
         SELECT posts.*, 
@@ -333,4 +333,3 @@ app.listen(3000,function(){
 });app.get('/post', function(req, res) {
     res.render('post'); // Make sure post.pug exists in the 'views' folder
     });
-    
