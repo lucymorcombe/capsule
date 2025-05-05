@@ -1,13 +1,69 @@
 extends layout
 
 block content
-    h1 Profile
-
+  .profile-container
     if profile
-        h2= profile.Display_name
-        p Username: #{profile.Username}
-        p Email: #{profile.Email}
-        h3 Bio
-        p #{profile.bio}
+      .profile-card
+        .profile-header
+          h1= profile.Display_name
+          p.tagline Welcome back, #{profile.Username}!
+        .profile-details
+          p
+            strong Username: 
+            | #{profile.Username}
+          p
+            strong Email: 
+            | #{profile.Email}
+          if profile.bio
+            p
+              strong Bio:
+              br
+              | #{profile.bio}
+          else
+            p
+              strong Bio:
+              br
+              | No bio added yet.
     else
+      .profile-card
         p #{message}
+
+  style.
+    .profile-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .profile-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .profile-header {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1rem;
+    }
+
+    .profile-header h1 {
+      margin: 0;
+      font-family: "Audiowide", cursive;
+    }
+
+    .tagline {
+      font-size: 0.9rem;
+      color: gray;
+    }
+
+    .profile-details p {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+    }
+
+    .profile-details strong {
+      color: #333; 
+    }
