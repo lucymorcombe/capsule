@@ -1,30 +1,134 @@
 extends layout
 
 block content
-    h1 #{year}
+    style.
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: rgb(249, 249, 249);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            padding-top: 80px; 
+        }
 
-    - const hasDefaultHistory = year != 2012;
+        header {
+            height: 80px; 
+        }
+
+        h1 {
+            h1.yearsPage {
+            color: #495ad1;
+            text-align: center;
+            font-size: 56px;
+            text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .history-snippet, .post-snippet {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .history-snippet:hover, .post-snippet:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        h3, h2 {
+            color: #495ad1;
+            margin-top: 0;
+        }
+
+        a.read-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2a3fe6;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        a.read-more:hover {
+            color: #1e30c9;
+            text-decoration: underline;
+        }
+
+        a {
+            color: #2a3fe6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .author-info {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .author-info b a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .author-info b a:hover {
+            color: #2a3fe6;
+        }
+
+        small {
+            display: block;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 20px;
+        }
+
+        .more-text {
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+    h1 #{year || 'Unknown Year'}
+
+    - const hasDefaultHistory = year && year != 2012;
 
     if hasDefaultHistory
         // History 1
         div.history-snippet
             h3 The #{year} Global Climate Unity Pact
             p
-                | In #{year}, world leaders signed the landmark Global Climate Unity Pact (GCUP), aiming to drastically reduce emissions and shift to clean energy. This pivotal agreement marked the first time all major economies committed to net-zero targets.
-                span(id="more-text-1", style="display:none;")
-                    | After years of negotiations, leaders from 190+ countries agreed on binding commitments to cap warming at 1.5°C, with strict reporting and penalties. The pact also unlocked $500 billion in funding for developing nations, sparked major corporate pledges for sustainability, and reshaped international trade policies around green energy.
+                | In #{year}, world leaders signed the landmark Global Climate Unity Pact (GCUP), aiming to drastically reduce emissions and shift to clean energy.
+                span(id="more-text-1", class="more-text")
+                    | After years of negotiations, leaders from over 190 countries agreed on binding commitments. 
+                    | This pact builds on key milestones in global climate action  from the 1992 Earth Summit in Rio, to the Kyoto Protocol in 1997, and the Paris Agreement in 2015. 
+                    | These agreements evolved from soft pledges to legally binding targets, reflecting the urgency of climate change.
+                    | The GCUP mandates climate literacy programs, supports early-warning systems, and directs billions toward renewable tech in the Global South. 
+                    | For the first time, youth coalitions, indigenous groups, and island nations were integral to treaty negotiations.
+                    | It marks a definitive shift from climate ambition to climate accountability.
             p
                 a(href="#", class="read-more", data-target="more-text-1") Read more...
 
-            div 
+            div.author-info
                 b 
                     a(href="/profile/betty") Betty 
-                small 
-                    a(href="mailto:betty@trueet.yahoo") betty@trueet.yahoo
+                small @betty
                 h2 Climate Action: A New Era
-                p The Global Climate Unity Pact has inspired new hope worldwide. As a witness, I feel motivated to push for local climate solutions and awareness...
+                p The Global Climate Unity Pact has inspired new hope worldwide...
                 p 
-                    a(href="/post/betty-#{year}") Read more...
+                    a(href="#", class="read-more", data-target="more-text-1") Read more...
                 small Date posted: 3/04/#{year}
                 br
                 small Date of memory: 3/01/#{year}
@@ -34,21 +138,25 @@ block content
         div.history-snippet
             h3 Major Breakthrough in AI (#{year})
             p
-                | In #{year}, artificial intelligence made a groundbreaking leap with the debut of the first truly general-purpose AI assistant. This system integrated real-time reasoning, creativity, and emotional intelligence, redefining personal and professional workflows.
-                span(id="more-text-2", style="display:none;")
-                    | Its rollout revolutionized sectors from healthcare to engineering, enabling machines to collaborate meaningfully with humans. A robust ethics framework was built in, emphasizing transparency and safety, and its launch spurred global debates about AI rights and governance.
+                | In #{year}, artificial intelligence made a groundbreaking leap with the debut of the first truly general purpose AI assistant.
+                span(id="more-text-2", class="more-text")
+                    | This innovation was built on decades of research from early rule-based systems in the 1950s to deep learning in the 2010s.
+                    | The assistant surpassed its predecessors by integrating human-like reasoning, empathy detection, and real-time learning.
+                    | It was trained on ethical guidelines, multilingual databases, and was capable of emotional context interpretation.
+                    | Governments, universities, and tech firms collaborated to ensure transparency and safety in deployment.
+                    | The technology now assists in personalized education, global crisis response, and elderly care without replacing human decision-making.
+                    | It redefined what it means to interact with machines shifting from tools to teammates.
             p
                 a(href="#", class="read-more", data-target="more-text-2") Read more...
 
-            div 
+            div.author-info
                 b 
                     a(href="/profile/alex") Alex 
-                small 
-                    a(href="mailto:alex@innovationhub.com") alex@innovationhub.com
+                small @alex
                 h2 AI: Humanity’s Bold New Frontier
-                p Witnessing AI’s incredible evolution this year has been both thrilling and a bit daunting. I’m hopeful for a future where humans and AI collaborate for good.
+                p Witnessing AI’s incredible evolution this year has been both thrilling and a bit daunting...
                 p 
-                    a(href="/post/alex-#{year}") Read more...
+                    a(href="#", class="read-more", data-target="more-text-2") Read more...
                 small Date posted: 5/15/#{year}
                 br
                 small Date of memory: 5/10/#{year}
@@ -58,21 +166,25 @@ block content
         div.history-snippet
             h3 Space Exploration: The #{year} Mars Habitat Mission
             p
-                | In #{year}, humanity celebrated the successful landing and activation of the first fully self-sustaining habitat on Mars. This monumental feat was seen as a giant leap toward a permanent human presence beyond Earth.
-                span(id="more-text-3", style="display:none;")
-                    | The habitat featured advanced life-support systems, solar energy farms, and 3D-printed structures from Martian soil. It hosted 12 astronauts for over a year, providing vital data on long-term survival and paving the way for larger settlements.
+                | In #{year}, humanity celebrated the successful landing and activation of the first fully self-sustaining habitat on Mars.
+                span(id="more-text-3", class="more-text")
+                    | This milestone followed decades of robotic missions, lunar outposts, and orbital construction projects.
+                    | The Mars Habitat was constructed using 3D-printed materials sourced from Martian soil, dramatically reducing launch weight and costs.
+                    | It housed advanced water recycling systems, vertical hydroponics, and AI-based environmental controls.
+                    | International partnerships, led by NASA, ESA, and private aerospace firms, made the mission possible.
+                    | Astronauts now live and work in the habitat, conducting long-term experiments on human adaptation to Martian gravity and ecology.
+                    | The mission lays the groundwork for permanent settlements and acts as a launchpad for further planetary exploration.
             p
                 a(href="#", class="read-more", data-target="more-text-3") Read more...
 
-            div 
+            div.author-info
                 b 
                     a(href="/profile/luna") Luna 
-                small 
-                    a(href="mailto:luna@spacefrontiers.org") luna@spacefrontiers.org
+                small @luna
                 h2 Life on Mars: A Dream Realized
-                p As someone passionate about space, the Mars habitat success fills me with awe. Humanity is truly becoming an interplanetary species!
+                p As someone passionate about space, the Mars habitat success fills me with awe...
                 p 
-                    a(href="/post/luna-#{year}") Read more...
+                    a(href="#", class="read-more", data-target="more-text-3") Read more...
                 small Date posted: 7/20/#{year}
                 br
                 small Date of memory: 7/18/#{year}
@@ -80,19 +192,39 @@ block content
 
     // User Posts
     if data.length
-        each post in data
-            div 
+        each post, idx in data
+            div.post-snippet
                 b 
                     a(href=`/profile/${post.users_id}`) #{post.display_name} 
-                small 
-                    a(href=`mailto:${post.username}`) #{post.username}
+                small @#{post.username}
                 h2 #{post.Post_title}
-                p #{post.Full_text.substr(0,200)}...
+                p
+                    | #{post.Full_text.substr(0,200)}...
+                    span(id=`more-text-user-${idx}`, class="more-text") #{post.Full_text.substr(200)}
                 p 
-                    a(href=`/post/${post.post_id}`) Read more...
+                    a(href="#", class="read-more", data-target=`more-text-user-${idx}`) Read more...
                 small Date posted: #{post.formatted_posted_date}
                 br
                 small Date of memory: #{post.formatted_memory_date}
                 hr
     else if !hasDefaultHistory
-        p Add a New memory for year 
+        p Add a New memory for year
+
+    script.
+        document.querySelectorAll('.more-text').forEach(function(span) {
+            span.style.display = 'none';
+        });
+        document.querySelectorAll('.read-more').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.dataset.target;
+                const moreText = document.getElementById(targetId);
+                if (!moreText) {
+                    console.warn('No element found for target:', targetId);
+                    return;
+                }
+                const isVisible = moreText.style.display === 'inline';
+                moreText.style.display = isVisible ? 'none' : 'inline';
+                this.textContent = isVisible ? 'Read more...' : 'Read less...';
+            });
+        });
