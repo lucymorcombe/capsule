@@ -4,9 +4,18 @@ block content
   .profile-container
     if profile
       .profile-card
+
+        // Profile Image Display Only
+        .profile-image-section
+          if profile.imageUrl
+            img.profile-image(src=profile.imageUrl, alt="Profile Image")
+          else
+            img.profile-image(src="https://www.w3schools.com/howto/img_avatar.png", alt="Default Avatar")
+
         .profile-header
-          h1= profile.Display_name
+          p.profile-title Your Profile
           p.tagline Welcome back, #{profile.Username}!
+
         .profile-details
           p
             strong Username: 
@@ -24,6 +33,10 @@ block content
               strong Bio:
               br
               | No bio added yet.
+
+          // No Posts Message
+          if !profile.posts || profile.posts.length === 0
+            p(style="margin-top: 1rem; color: #666; font-style: italic;") This user has not posted yet.
     else
       .profile-card
         p #{message}
@@ -49,9 +62,12 @@ block content
       margin-bottom: 1rem;
     }
 
-    .profile-header h1 {
+    .profile-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      font-family: sans-serif;
       margin: 0;
-      font-family: "Audiowide", cursive;
+      color: #333;
     }
 
     .tagline {
@@ -62,8 +78,25 @@ block content
     .profile-details p {
       font-size: 1rem;
       margin: 0.5rem 0;
+      font-family: sans-serif;
     }
 
     .profile-details strong {
-      color: #333; 
+      color: #333;
+    }
+
+    .profile-image-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ccc;
+      margin-bottom: 0.5rem;
     }
