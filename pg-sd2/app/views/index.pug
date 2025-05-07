@@ -1,20 +1,50 @@
 extends layout 
 block content 
-    h1.center-text WELCOME TO CAPSULE
-    p Capsule is a place where moments are preserved and memories come to life. Here at Capsule, you can create posts to capture your most important events, milestones, and experiences. You can also Browse through your past stories, revisit treasured memories, and keep your journey beautifully archived in one place. Start sharing today and watch your story unfold over time. Every memory matters.
+    div.homeContainer
+        img(src='https://images.unsplash.com/photo-1533158307587-828f0a76ef46?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
+        div.welcomeContainer
+            h1.welcomeText WELCOME TO CAPSULE
+            p Capsule is a place where moments are preserved and memories come to life. Here at Capsule, you can create posts to capture your most important events, milestones, and experiences. You can also Browse through your past stories, revisit treasured memories, and keep your journey beautifully archived in one place. Start sharing today and watch your story unfold over time. Every memory matters.
     
     style.
-            .center-text {
+
+            body {
+                padding-top: 0px;
+            }
+            .homeContainer {
+                overflow-x:hidden;
+            }
+            .homeContainer img {
+                width:100vw;
+                height: 100vh;
+                object-fit: cover;
+                filter: grayscale(100%);
+                position: relative;
+            }
+
+            .welcomeContainer {
+                width: 60%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .welcomeText {
                 text-align: center;
                 margin-top: 50px;
-                font-size: 36px;
-                color: #333;
+                font-size: 60px;
+                color: #f5f5f5;
+                text-shadow: 4px 4px 5px #495ad1;
             }
             p {
                 text-align: center;
                 margin: 20px auto;
-                font-size: 24px;
-                color: #555;
-                line-height: 1.6;
-                width: 70%;
+                font-size: 18px;
+                background-color: #f5f5f5;
+                padding: 10px;
+                //- border: 3px solid #495ad1;
+                //- box-shadow: 0px 0px 50px 50px;
+                color: #495ad1;
+                line-height: 1.5;
             }
