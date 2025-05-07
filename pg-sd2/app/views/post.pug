@@ -1,29 +1,98 @@
 extends layout
 
 block content
-    // Show post only if it exists
+  .container.mt-4
+    if flash
+      .alert.alert-dismissible(class=`alert-${flash.type}`)
+        button.close(type='button', data-dismiss='alert') ×
+        | #{flash.message}
+
     if post
-        b 
-            a(href=`/profile/${post.Users_id}`) #{post.Display_name}
-        small 
-            a(href=`/profile/${post.Users_id}`) #{post.Username}
-        h2 #{post.Post_title}
-        p #{post.Full_text}           
-        small Date posted: #{post.formatted_posted_date}
-        br
-        small Date of memory: #{post.formatted_memory_date}
+      .card.mb-4
+        .card-header
+          if post.Category_name
+            span.badge.badge-info= post.Category_name
+          if post.formatted_memory_date
+            small.float-right.text-muted Memory from: #{post.formatted_memory_date}
+        .card-body
+          h1.card-title= post.Post_title
+          .post-author.mb-3
+            b
+              a(href=`/profile/${post.Users_id}`) #{post.Display_name}
+            small.text-muted.ml-2 @#{post.Username}
+          p.card-text(style='white-space: pre-line')= post.Full_text
+        .card-footer.text-muted
+          | Posted on #{post.formatted_posted_date}
+
+      h3.mt-5 Recent Memories
+      if recentPosts && recentPosts.length
+        .row
+          each memory in recentPosts
+            .col-md-6.mb-4
+              .card.h-100
+                .card-header
+                  if memory.Category_name
+                    span.badge.badge-info= memory.Category_name
+                  small.float-right.text-muted= memory.formatted_posted_date
+                .card-body
+                  h5.card-title= memory.Post_title
+                  .post-author.small.mb-2
+                    | by 
+                    a(href=`/profile/${memory.Users_id}`) #{memory.Display_name}
+                  p.card-text= memory.Full_text.substring(0, 100) + (memory.Full_text.length > 100 ? '...' : '')
+                .card-footer
+                  a.btn.btn-sm.btn-outline-primary(href=`/post/${memory.Post_id}`) Read More
+
     else if user
-        // If user exists but no post, show the form
-        h3 Add a Post
-        form(action="/post", method="POST")
+      .card
+        .card-header
+          h3.card-title Add a Memory
+        .card-body
+          form(action="/post", method="POST")
             input(type="hidden", name="Users_id", value=user.Users_id)
-            p
-                label Title:
-                input(type="text", name="Post_title", required)
-            p
-                label Content:
-                textarea(name="Full_text", rows="20", cols="60", required)
-            p
-                input(type="submit", value="Submit")
+            
+            .form-group
+              label(for="Post_title") Title
+              input.form-control(type="text", name="Post_title", id="Post_title", required)
+            
+            .form-group
+              label(for="Category_id") Category
+              select.form-control(name="Category_id", id="Category_id", required)
+                option(value="") -- Select Category --
+                each category in categories
+                  option(value=category.Categories_id)= category.Categories_name 
+                  
+            
+            .form-group
+              label(for="DATE_OF_MEMORY") Date of Memory 
+              input.form-control(type="date", name="DATE_OF_MEMORY", id="DATE_OF_MEMORY" required)
+            
+            .form-group
+              label(for="Full_text") Your Memory
+              textarea.form-control(name="Full_text", id="Full_text", rows="14",cols="90" required)
+            
+            button.btn.btn-primary(type="submit") Save Memory
+
     else
-        p You must be logged in to post.
+      .alert.alert-warning
+        | You must be 
+        a.alert-link(href="/login") logged in
+        |  to post.
+
+  style.
+    .badge-info {
+      background-color: #17a2b8;
+    }
+    .post-author a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .post-author a:hover {
+      text-decoration: underline;
+    }
+    .card {
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+    }

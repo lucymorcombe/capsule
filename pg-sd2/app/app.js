@@ -60,90 +60,168 @@ if (decade && !isNaN(decade)) {
 
     res.render("years", {allYears, selectedDecade : decade});
 });
+// Get all categories for dropdown
+/*async function getCategories() {
+    const [categories] = await db.query('SELECT * FROM categories');
+    return categories;
+}*/
+async function getCategories() {
+    const [rows] = await db.query("SELECT Categories_id, Categories_name FROM CATEGORIES");
+    return rows;
+  }
+  
 
 // Show the new post form
-app.get("/post", (req, res) => {
-    console.log("â—â—â—session data at /post:", req.session);
-    // check if user is logged in
+app.get("/post", async (req, res) => {
     if (!req.session.loggedIn) {
-        // if not logged in, send to login page
+        req.session.returnTo = '/post';
         return res.redirect('/login');
     }
 
-    const user = {
-        Users_id: req.session.uid,
-        Username: req.session.username,
-        Display_name: req.session.display_name
-    };
-
-    //if logged in show post form
-    res.render('post', { post: null, user });
+    try {
+        const categories = await getCategories();
+        res.render('post', {
+            post: null,
+            user: {
+                Users_id: req.session.uid,
+                Username: req.session.username,
+                Display_name: req.session.display_name
+            },
+            categories,
+            formData: {
+                Post_title: '',
+                Full_text: '',
+                Category_id: '',
+                DATE_OF_MEMORY: ''
+            }
+        });
+    } catch (err) {
+        console.error("Error fetching categories:", err);
+        res.status(500).send("Error loading post form");
+    }
 });
 
-// Handle post creation (form submission)
-app.post("/post", (req, res) => {
+// Handle post creation
+app.post("/post", async (req, res) => {
     if (!req.session.loggedIn) {
         return res.redirect('/login');
     }
     
-    const { Post_title, Full_text } = req.body;
+    const { Post_title, Full_text, Categories_id, DATE_OF_MEMORY } = req.body;
     const Users_id = req.session.uid;
 
-    if (!Users_id || !Post_title || !Full_text) {
-        return res.status(400).send("All fields are required.");
-    }
-
-    //check if user exists
-    const userCheckSql = `SELECT * FROM users WHERE Users_id = ?`;
-    db.query(userCheckSql, [Users_id], (err, results) => {
-        if (err) {
-            console.error("Database error:", err);
-            return res.status(500).send("Could not check user.");
+    try {
+       // const categories = await getCategories();
+       const categories = await getCategories();
+       console.log("CATEGORIES fetched:", categories); 
+       
+        if (!Post_title?.trim() || !Full_text?.trim() || !Categories_id) {
+            return res.status(400).render('post', {
+                error: "All fields are required",
+                categories,
+                formData: req.body,
+                user: {
+                    Users_id: req.session.uid,
+                    Username: req.session.username,
+                    Display_name: req.session.display_name
+                }
+            });
         }
+        
+        
 
-        if (results.length === 0) {
-            return res.status(400).send("User not found.");
+        // Verify category exists
+        const [categoryRows] = await db.query('SELECT * FROM CATEGORIES WHERE Categories_id = ?', [Categories_id]);
+const category = categoryRows[0];
+
+if (!category) {
+    return res.status(400).render('post', {
+        error: "Invalid category",
+        categories,
+        formData: req.body,
+        user: {
+            Users_id: req.session.uid,
+            Username: req.session.username,
+            Display_name: req.session.display_name
         }
-
-        // add new post to database
-        const insertSql = `
-            INSERT INTO posts (Users_id, Post_title, Full_text, DATE_posted)
-            VALUES (?, ?, ?, NOW())
-        `;
-
-        db.query(insertSql, [Users_id, Post_title, Full_text], (err, result) => {
-            if (err) {
-                console.error("Error inserting post:", err);
-                return res.status(500).send("Could not save post.");
-            }
-
-            //go to new post
-            const newPostId = result.insertId;
-            res.redirect(`/post/${newPostId}`);
-        });
     });
+}
+
+
+        const [result] = await db.query(`
+            INSERT INTO POSTS 
+            (Users_id, Post_title, Full_text, DATE_posted, Categories_id, DATE_OF_MEMORY)
+            VALUES (?, ?, ?, NOW(), ?, ?)
+        `, [Users_id, Post_title.trim(), Full_text.trim(), Categories_id, DATE_OF_MEMORY || null]);
+        
+        req.session.flash = { type: 'success', message: 'Post created successfully!' };
+        res.redirect(`/post/${result.insertId}`);
+
+    } catch (err) {
+        console.error("Post creation error:", err);
+        const categories = await getCategories();
+        res.status(500).render('post', {
+            error: "Failed to create post",
+            categories,
+            formData: req.body,
+            user: {
+                Users_id: req.session.uid,
+                Username: req.session.username,
+                Display_name: req.session.display_name
+            }
+        });
+    }
 });
 
-// View a single post by ID
-app.get("/post/:id", async function (req, res) {
-    const postid = req.params.id;
-    const sql = `
-        SELECT posts.*, 
-        DATE_FORMAT(posts.DATE_posted, '%d/%m/%Y') AS formatted_posted_date,
-        DATE_FORMAT(posts.DATE_OF_MEMORY, '%d/%m/%Y') AS formatted_memory_date,
-        users.Username, users.Display_name
-        FROM POSTS
-        JOIN users ON posts.Users_id = users.Users_id
-        WHERE posts.Post_id = ?
-    `;
-
+// View single post
+app.get("/post/:id", async (req, res) => {
     try {
-        const results = await db.query(sql, [postid]);
-        const post = results[0];
-        res.render("post", { post: post, user: req.session.user });
+        const [post] = await db.query(`
+            SELECT 
+                POSTS.*,
+                categories.Categories_name as Category_name,
+                DATE_FORMAT(posts.DATE_posted, '%W, %M %e %Y') AS formatted_posted_date,
+                DATE_FORMAT(posts.DATE_OF_MEMORY, '%W, %M %e %Y') AS formatted_memory_date,
+                users.Username, 
+                users.Display_name
+            FROM posts
+            JOIN users ON posts.Users_id = users.Users_id
+            LEFT JOIN categories ON posts.Category_id = categories.Categories_id
+            WHERE posts.Post_id = ?
+        `, [req.params.id]);
+
+        if (!post) {
+            return res.status(404).render('404', { message: "Post not found" });
+        }
+
+        // Get recent posts for memory wall
+        const [recentPosts] = await db.query(`
+            SELECT 
+                posts.*,
+                categories.Categories_name as Category_name,
+                users.Display_name,
+                DATE_FORMAT(posts.DATE_posted, '%W, %M %e %Y') AS formatted_posted_date
+            FROM POSTS
+            JOIN users ON posts.Users_id = users.Users_id
+            LEFT JOIN categories ON posts.Categories_id = categories.Categories_id
+            ORDER BY posts.DATE_posted DESC
+            LIMIT 10
+        `);
+
+        res.render("post", { 
+            post,
+            recentPosts,
+            user: req.session.user,
+            flash: req.session.flash
+        });
+        delete req.session.flash;
+
     } catch (err) {
-        console.error(err);
-        res.status(500).send("Could not fetch post.");
+        console.error(`Error fetching post ${req.params.id}:`, err);
+        res.status(500).render('error', {
+            message: "Failed to load post",
+            error: process.env.NODE_ENV === 'development' ? err : {}
+        });
     }
 });
 
